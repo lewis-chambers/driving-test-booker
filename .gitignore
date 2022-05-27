@@ -2,4 +2,5 @@
 /Lib
 /Scripts
 /Include
+*.env
 *.cfg
