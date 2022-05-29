@@ -606,19 +606,14 @@ def print_wanted_sites():
         printAndLog(wanted[site].exclusion_dates_str, header="Exclusion Dates")
 
 def get_driver():
-    buster_enabled = True
     pth = os.path.join(os.path.dirname(__file__), 'chromedriver.exe')
     chrome_path =  chromedriver_autoinstaller.install()
-    buster_path = os.path.join(os.path.dirname(__file__), 'buster_captcha_solver_for_humans-1.3.1-chrome.zip')
     print("Chrome path: {}".format(chrome_path))
     chrome_options = uc.ChromeOptions()
     chrome_options.add_argument('--enable-javascript')
     chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
     prefs = {"profile.managed_default_content_settings.images": 2} # Hide images (experimental)
     chrome_options.add_experimental_option("prefs", prefs)
-    chrome_options.add_extension(buster_path)
-    #if buster_enabled:
-    #    chrome_options.add_extension(buster_path)
 
     driver_out = uc.Chrome(executable_path=chrome_path, chrome_options=chrome_options)
     driver_out.execute_cdp_cmd('Network.enable', {})
@@ -647,7 +642,7 @@ if __name__ == '__main__':
     post_code = "OX12"
 
     start_date_str = '10/06/2022'
-    end_date_str = '24/06/2022'
+    end_date_str = '08/07/2022'
     start_date_num = int(datetime.strptime(start_date_str, '%d/%m/%Y').timestamp())
     end_date_num = int(datetime.strptime(end_date_str, '%d/%m/%Y').timestamp())
 
