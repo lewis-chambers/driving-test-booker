@@ -4,3 +4,5 @@
 /Include
 *.env
 *.cfg
+/logs
+/__pycache__

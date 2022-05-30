@@ -196,10 +196,10 @@ def UpdatePageID(sleep_for=float(2), print_id=True):
     page_html = driver.page_source
 
     try:
-        body_id = body_tag.get_attribute('id')
+        body_id = driver.find_element(By.TAG_NAME,'body').get_attribute('id')
 
         if body_id == '':
-            body_id = body_tag.get_attribute('data-pageid')
+            body_id = driver.find_element(By.TAG_NAME,'body').get_attribute('data-pageid')
 
         if body_id == "page-login":
             new_id = 0
