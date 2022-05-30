@@ -127,7 +127,8 @@ def Dead():
 def SubmitNewDate():
     # submit changes
     element = WebDriverWait(driver, 60).until(
-        EC.element_to_be_clickable((By.ID, 'confirm-changes')))
+        EC.presence_of_element_located((By.ID, 'confirm-changes')))
+    scroll_to_element(element)
     RandomWait(0.5, 1)
     element.click()
 
@@ -287,10 +288,9 @@ def CheckValidTime():
 
 def HoldDate(day_element, time_element):
     try:
-        soup = bs(driver.page_source, 'html.parser')
         MakeLine()
         month = datetime.strptime(day_element.get_attribute('data-date'), '%Y-%m-%d').month
-        month_calendar = months.index(soup.find(class_='BookingCalendar-currentMonth').text) + 1
+        month_calendar = months.index(driver.find_element(By.CLASS_NAME, 'BookingCalendar-currentMonth').text) + 1
 
         if month != month_calendar:
             buttons = driver.find_element(By.CLASS_NAME, 'BookingCalendar-header').find_elements(By.TAG_NAME, 'a')
@@ -301,26 +301,38 @@ def HoldDate(day_element, time_element):
                 elif month_calendar < month:
                     buttons[1].click()
 
-                month_calendar = months.index(soup.find(class_='BookingCalendar-currentMonth').text) + 1
+                month_calendar = months.index(driver.find_element(By.CLASS_NAME, 'BookingCalendar-currentMonth').text) + 1
                 RandomWait(0.5, 1)
 
         printAndLog("Holding earliest slot")
         # clicking date on calendar
         RandomWait(0.5, 1)
+        scroll_to_element(day_element)
+        WebDriverWait(driver, 60).until(
+            EC.element_to_be_clickable(day_element))
+
         day_element.click()
         printAndLog("Day clicked")
 
         # clicking time
         RandomWait(0.5, 1)
-        time_element.find_element(By.XPATH, '..').click()
+        time_clickable = time_element.find_element(By.XPATH, '..')
+        scroll_to_element(time_clickable)
+        WebDriverWait(driver, 60).until(
+            EC.element_to_be_clickable(time_clickable))
+        time_clickable.click()
         printAndLog("Time clicked")
 
         # submitting
         driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
         RandomWait(0.5, 1)
 
-        submit = driver.find_element(By.ID, 'slot-chosen-submit')
-        submit.click()
+        submit_btn = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located((By.ID, 'slot-chosen-submit')))
+        scroll_to_element(submit_btn)
+        WebDriverWait(driver, 60).until(
+            EC.element_to_be_clickable(submit_btn))
+        submit_btn.click()
         printAndLog("Date submitted for confirmation")
     except:
         driver.refresh()
@@ -331,7 +343,8 @@ def HoldDate(day_element, time_element):
 def DismissCalendarWarning():
     # continue
     element = WebDriverWait(driver, 60).until(
-        EC.element_to_be_clickable((By.ID, 'slot-warning-continue')))
+        EC.presence_of_element_located((By.ID, 'slot-warning-continue')))
+    scroll_to_element(element)
     RandomWait(0.5, 1)
     element.click()
     print("15 minute warning dismissed")
@@ -340,7 +353,8 @@ def DismissCalendarWarning():
 def ConfirmCandidate():
     # verify the candidate
     element = WebDriverWait(driver, 60).until(
-        EC.element_to_be_clickable((By.ID, 'i-am-candidate')))
+        EC.presence_of_element_located((By.ID, 'i-am-candidate')))
+    scroll_to_element(element)
     RandomWait(0.5, 1)
     element.click()
     print("Continued to confirmation page")
@@ -413,7 +427,7 @@ def SearchLoop(first=False):
             RandomWait(0.5, 1)
             for site in available_sites:
                 driver.get(site['link'])
-                date_submitted = CalendarLoop(site)
+                date_submitted = CalendarLoop()
 
                 if date_submitted:
                     return
@@ -456,14 +470,17 @@ def scrape_calendar():
 
     return available_dates
 
+def scroll_to_element(element):
+    action = ActionChains(driver)
+    action.move_to_element(element).perform()
 
-def CalendarLoop(site):
-    WebDriverWait(driver, 60).until(
+def CalendarLoop():
+    centre_banner = WebDriverWait(driver, 60).until(
         EC.presence_of_element_located((By.ID, 'chosen-test-centre')))
 
-    location = site['location']
-    for key in wanted.keys().lower():
-        if key in location:
+    location = centre_banner.text.split('\n')[0].lower()
+    for key in wanted.keys():
+        if key.lower() in location:
             location = key
             break
 
@@ -502,20 +519,20 @@ def back_to_search():
 
 def play_error_sound():
     try:
-        playsound(os.path.join('sounds','aiya.wav'), block=False)
-        printAndLog("aiya.wav played")
+        Dead()
+        printAndLog("Played error sound")
     except:
         Dead()
-        printAndLog("Failed to play aiya.wav")
+        printAndLog("Failed to play error sound")
 
 
 def play_found_booking_sound():
     try:
-        playsound(os.path.join('sounds', 'get_it_get_it.wav'), block=False)
-        printAndLog("get_it_get_it.wav played")
+        Beep()
+        printAndLog("Played booking found sound")
     except:
         Dead()
-        printAndLog("Failed to play get_it_get_it.wav")
+        printAndLog("Failed to play booking found sound")
 
 
 def save_error_html():
@@ -692,8 +709,8 @@ if __name__ == '__main__':
 
                     while True:
                         CheckValidTime()
-                        for test_loop in range(20):
-                            print('Test_{}'.format(test_loop))
+                        for test_loop in range(5):
+                            print('Test_{}'.format(test_loop+1))
                             UpdatePageID(0)
 
                         if page_id == -1:
