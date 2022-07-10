@@ -547,7 +547,7 @@ def captcha_loop():
     while page_id == 666:
         RandomWait(0.5, 1)
         UpdatePageID(1, print_id=False)
-        click_captcha()
+
         captcha_counter = captcha_counter + 1
         if captcha_counter % 10 == 0:
             print('%i seconds passed' % captcha_counter)
@@ -699,7 +699,10 @@ if __name__ == '__main__':
                             printAndLog("Blocked by security rules, restarting")
                             driver.quit()
                         elif page_id == 666:
-                            captcha_loop()
+                            try:
+                                click_captcha()
+                            finally:
+                                captcha_loop()
                         elif page_id == 667:
                             printAndLog("Server error")
                             raise Exception("Server Error")
