@@ -10,13 +10,11 @@ from selenium.webdriver.common.by import By
 import numpy
 import time
 from datetime import datetime
-import winsound
 import re
 import traceback
 import os
 import skippable_timer
 import codecs
-from playsound import playsound
 from dotenv import load_dotenv
 import chromedriver_autoinstaller
 
@@ -111,17 +109,6 @@ def NavToSearchPage():
     RandomWait(0.5, 1)
     element.click()
     printAndLog("Navigated to search page")
-
-
-def Beep():
-    for i in range(1, 10):
-        winsound.Beep(i * 200, 300)
-    for i in range(1, 10):
-        winsound.Beep((i + 2) * 200, 300)
-
-
-def Dead():
-    winsound.Beep(2500, 1500)
 
 
 def SubmitNewDate():
@@ -361,9 +348,6 @@ def ConfirmCandidate():
 
 
 def HoldForAWhile():
-    # moveOnscreen()
-    play_found_booking_sound()
-
     print("After 15 minutes program will resume.\nPress enter to abort.")
     timer_broken = skippable_timer.timer(15 * 60)
     if timer_broken:
@@ -435,7 +419,7 @@ def SearchLoop(first=False):
         else:
             Wait()
     except:
-        play_error_sound()
+        pass
 
 
 def scrape_calendar():
@@ -517,24 +501,6 @@ def back_to_search():
         EC.element_to_be_clickable((By.ID, 'change-test-centre'))).click()
 
 
-def play_error_sound():
-    try:
-        Dead()
-        printAndLog("Played error sound")
-    except:
-        Dead()
-        printAndLog("Failed to play error sound")
-
-
-def play_found_booking_sound():
-    try:
-        Beep()
-        printAndLog("Played booking found sound")
-    except:
-        Dead()
-        printAndLog("Failed to play booking found sound")
-
-
 def save_error_html():
     try:
         error_time = datetime.now().strftime('%Y-%m-%d %H;%M;%S')
@@ -581,7 +547,7 @@ def captcha_loop():
     while page_id == 666:
         RandomWait(0.5, 1)
         UpdatePageID(1, print_id=False)
-        #click_captcha()
+        click_captcha()
         captcha_counter = captcha_counter + 1
         if captcha_counter % 10 == 0:
             print('%i seconds passed' % captcha_counter)
@@ -593,26 +559,7 @@ def click_captcha():
     checkbox = WebDriverWait(driver, 60).until(
         EC.element_to_be_clickable((By.CLASS_NAME, 'rc-anchor-center-container')))
     checkbox.click()
-    try:
-        driver.switch_to.parent_frame()
-        frames = driver.find_elements(By.TAG_NAME, 'iframe')
-        if len(frames) == 1:
-            driver.switch_to.frame(frames[0])
-            frames = driver.find_elements(By.TAG_NAME, 'iframe')
-
-        driver.switch_to.frame(frames[2])
-        controls = driver.find_element(By.CLASS_NAME, 'rc-buttons')
-        loc = controls.location
-        items = controls.find_elements(By.TAG_NAME, 'div')
-        loc2 =items[2].location
-
-        RandomWait(0.5,1)
-        action = ActionChains(driver)
-        action.move_to_element_with_offset(controls, loc2['x'] - loc['x'], 0)
-        action.click()
-        action.perform()
-    except:
-        print("Captcha solution not clicked")
+    driver.switch_to.default_content()
 
 
 def print_wanted_sites():
@@ -752,21 +699,20 @@ if __name__ == '__main__':
                             printAndLog("Blocked by security rules, restarting")
                             driver.quit()
                         elif page_id == 666:
-                            play_error_sound()
                             captcha_loop()
                         elif page_id == 667:
                             printAndLog("Server error")
                             raise Exception("Server Error")
 
             except Exception as e:
-                MakeLine()
-                MakeLine()
-                MakeLine()
-
-                play_error_sound()
-                save_error_html()
-
                 try:
-                    driver.quit()
+                    MakeLine()
+                    MakeLine()
+                    MakeLine()
+
+                    save_error_html()
                 finally:
-                    LogIt(traceback.format_exc())
+                    try:
+                        driver.quit()
+                    finally:
+                        LogIt(traceback.format_exc())
