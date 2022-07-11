@@ -13,7 +13,6 @@ from datetime import datetime
 import re
 import traceback
 import os
-import skippable_timer
 import codecs
 from dotenv import load_dotenv
 import chromedriver_autoinstaller
@@ -348,19 +347,16 @@ def ConfirmCandidate():
 
 
 def HoldForAWhile():
-    print("After 15 minutes program will resume.\nPress enter to abort.")
-    timer_broken = skippable_timer.timer(15 * 60)
-    if timer_broken:
-        answer = ""
-        print("Would you like to continue or terminate the program?")
-        while answer.lower() not in ['continue', 'terminate']:
-            answer = input("(continue/terminate): ")
+    answer = ""
+    print("Would you like to continue or terminate the program?")
+    while answer.lower() not in ['continue', 'terminate']:
+        answer = input("(continue/terminate): ")
 
-        if answer.lower() == 'terminate':
-            try:
-                driver.quit()
-            finally:
-                exit()
+    if answer.lower() == 'terminate':
+        try:
+            driver.quit()
+        finally:
+            exit()
 
     while page_id not in [100, 200, 201]:
         printAndLog("Going back hold")
