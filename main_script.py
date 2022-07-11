@@ -500,7 +500,7 @@ def back_to_search():
 def save_error_html():
     try:
         error_time = datetime.now().strftime('%Y-%m-%d %H;%M;%S')
-        with codecs.open(log_folder_instance + '\\Errors\\' + error_time) as file:
+        with codecs.open(os.path.join(log_folder_instance, 'Errors', error_time)) as file:
             file.write(driver.page_source)
         print("Saved Error HTML at: ", error_time)
     except:
@@ -567,6 +567,7 @@ def print_wanted_sites():
 
 def get_driver():
     pth = os.path.join(os.path.dirname(__file__), 'chromedriver.exe')
+    print("madeit")
     chrome_path =  chromedriver_autoinstaller.install()
     print("Chrome path: {}".format(chrome_path))
     chrome_options = uc.ChromeOptions()
@@ -624,9 +625,9 @@ if __name__ == '__main__':
     now_time = datetime.now().strftime('%Y-%m-%d %H;%M;%S')
 
     log_folder_master = "logs"
-    log_folder_instance = "logs\\" + now_time
+    log_folder_instance = os.path.join(log_folder_master,now_time)
 
-    log_path = log_folder_instance + '\\' + now_time + '.txt'
+    log_path = os.path.join(log_folder_instance, now_time + ".txt")
 
     HOLD = True
     proxies = []
@@ -646,7 +647,7 @@ if __name__ == '__main__':
 
             try:
                 with get_driver() as driver:
-
+                    print("got driver")
                     page_id = None
                     page_counter = 0
 

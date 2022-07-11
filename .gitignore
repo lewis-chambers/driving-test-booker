@@ -6,3 +6,5 @@
 *.cfg
 /logs
 /__pycache__
+TOKEN.txt
+.DS_STORE
