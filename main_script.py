@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -15,7 +14,6 @@ import traceback
 import os
 import codecs
 from dotenv import load_dotenv
-import chromedriver_autoinstaller
 
 
 def login():
@@ -566,24 +564,12 @@ def print_wanted_sites():
         printAndLog(wanted[site].exclusion_dates_str, header="Exclusion Dates")
 
 def get_driver():
-    pth = os.path.join(os.path.dirname(__file__), 'chromedriver.exe')
-    print("madeit")
-    chrome_path =  chromedriver_autoinstaller.install()
-    print("Chrome path: {}".format(chrome_path))
-    chrome_options = uc.ChromeOptions()
-    chrome_options.add_argument('--enable-javascript')
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    prefs = {"profile.managed_default_content_settings.images": 2} # Hide images (experimental)
-    chrome_options.add_experimental_option("prefs", prefs)
-
-    driver_out = uc.Chrome(executable_path=chrome_path, chrome_options=chrome_options)
-    driver_out.execute_cdp_cmd('Network.enable', {})
-
-    return driver_out
+    driver = uc.Chrome()
+    return driver
 
 
 if __name__ == '__main__':
-    load_dotenv()
+    load_dotenv("RYAN.env")
     page_limit = 20
     months = [
         "January",
