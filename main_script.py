@@ -574,7 +574,8 @@ def load_dotenv_file(dotenv_path: str) -> None:
     Returns: None."""
 
     if not os.path.isfile(dotenv_path):
-        raise FileNotFoundError(f"dotenv file '{dotenv_path}' does not exist.")
+        dotenv_message = "`LICENCE=<your licence>\nREFERENCE=<your test reference>`"
+        raise FileNotFoundError(f"dotenv file '{dotenv_path}' does not exist. You must make a file ending in '.env' with the content:\n\n{dotenv_message}")
 
     load_dotenv(dotenv_path)
 
@@ -586,7 +587,7 @@ def load_dotenv_file(dotenv_path: str) -> None:
 
 if __name__ == '__main__':
     load_dotenv_file("credentials.env")
-    
+
     page_limit = 20
     months = [
         "January",
