@@ -8,3 +8,4 @@
 /__pycache__
 TOKEN.txt
 .DS_STORE
+*.swp

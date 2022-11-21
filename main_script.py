@@ -566,9 +566,27 @@ def get_driver():
     driver = uc.Chrome()
     return driver
 
+def load_dotenv_file(dotenv_path: str) -> None:
+    """Loads a dotenv file from a given path and checks for right variables.
+    
+    Args:
+        dotenv_path: Path of `.env` file.
+    Returns: None."""
+
+    if not os.path.isfile(dotenv_path):
+        raise FileNotFoundError(f"dotenv file '{dotenv_path}' does not exist.")
+
+    load_dotenv(dotenv_path)
+
+    if "REFERENCE" not in os.environ.keys():
+        raise KeyError("key 'REFERENCE' not found in os.environ.")
+    
+    if "LICENCE" not in os.environ.keys():
+        raise KeyError("key 'LICENCE' not found in os.environ.")
 
 if __name__ == '__main__':
-    load_dotenv("credentials.env")
+    load_dotenv_file("credentials.env")
+    
     page_limit = 20
     months = [
         "January",
