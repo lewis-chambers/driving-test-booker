@@ -472,7 +472,7 @@ def CalendarLoop():
         for day in available_days:
             if wanted[location].start_num <= int(day['datetimes'][0].timestamp()) <= wanted[location].end_num:
                 for i in range(0, len(day['datetimes'])):
-                    if day['datetimes'][i].hour >= 9:
+                    if day['datetimes'][i].hour >= 12:
                         day_element = driver.find_element(By.XPATH, '//a[@href="' + day['day_element_ref'] + '"]')
                         time_element = driver.find_element(By.ID, day['time_box_ids'][i])
 
