@@ -1,8 +1,6 @@
 import undetected_chromedriver as uc
 from bs4 import BeautifulSoup as bs
-from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -21,16 +19,16 @@ def login():
     password = os.getenv("REFERENCE")
     user_field = WebDriverWait(driver, 300).until(
         EC.element_to_be_clickable((By.ID, 'driving-licence-number')))
-    RandomWait(0.5, 1)
+    RandomWait(1, 2.4)
     user_field.send_keys(username)
     printAndLog("Username entered")
 
-    RandomWait(0.5, 1)
+    RandomWait(1,2.8)
     password_field = driver.find_element(By.ID, 'application-reference-number')
     password_field.send_keys(password)
     printAndLog("Password entered")
 
-    RandomWait(0.5, 1)
+    RandomWait(1, 2.7)
     driver.find_element(By.ID, 'booking-login').click()
     printAndLog("Credentials submitted\n")
 
@@ -103,7 +101,7 @@ def NavToSearchPage():
     # navigate to test centre change
     element = WebDriverWait(driver, 60).until(
         EC.element_to_be_clickable((By.ID, 'test-centre-change')))
-    RandomWait(0.5, 1)
+    RandomWait(0.8, 3)
     element.click()
     printAndLog("Navigated to search page")
 
@@ -113,7 +111,7 @@ def SubmitNewDate():
     element = WebDriverWait(driver, 60).until(
         EC.presence_of_element_located((By.ID, 'confirm-changes')))
     scroll_to_element(element)
-    RandomWait(0.5, 1)
+    RandomWait(0.9, 2.9)
     element.click()
 
     driver.exit()
@@ -290,7 +288,7 @@ def HoldDate(day_element, time_element):
 
         printAndLog("Holding earliest slot")
         # clicking date on calendar
-        RandomWait(0.5, 1)
+        RandomWait(0.8, 3)
         scroll_to_element(day_element)
         WebDriverWait(driver, 60).until(
             EC.element_to_be_clickable(day_element))
@@ -299,7 +297,7 @@ def HoldDate(day_element, time_element):
         printAndLog("Day clicked")
 
         # clicking time
-        RandomWait(0.5, 1)
+        RandomWait(0.8, 3.1)
         time_clickable = time_element.find_element(By.XPATH, '..')
         scroll_to_element(time_clickable)
         WebDriverWait(driver, 60).until(
@@ -309,7 +307,7 @@ def HoldDate(day_element, time_element):
 
         # submitting
         driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-        RandomWait(0.5, 1)
+        RandomWait(0.9, 2.2)
 
         submit_btn = WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.ID, 'slot-chosen-submit')))
@@ -329,7 +327,7 @@ def DismissCalendarWarning():
     element = WebDriverWait(driver, 60).until(
         EC.presence_of_element_located((By.ID, 'slot-warning-continue')))
     scroll_to_element(element)
-    RandomWait(0.5, 1)
+    RandomWait(1, 2.4)
     element.click()
     print("15 minute warning dismissed")
 
@@ -339,7 +337,7 @@ def ConfirmCandidate():
     element = WebDriverWait(driver, 60).until(
         EC.presence_of_element_located((By.ID, 'i-am-candidate')))
     scroll_to_element(element)
-    RandomWait(0.5, 1)
+    RandomWait(1, 3)
     element.click()
     print("Continued to confirmation page")
 
@@ -365,28 +363,28 @@ def HoldForAWhile():
 
 def InitialSearch():
     # searching test centers
-    RandomWait(0.5, 1)
+    RandomWait(2, 4)
     element = WebDriverWait(driver, 60).until(
         EC.element_to_be_clickable((By.ID, 'test-centres-input')))
     element.clear()
     element.send_keys(post_code)
     printAndLog("Search entered")
 
-    RandomWait(0.5, 1)
+    RandomWait(1,2)
     driver.find_element(By.ID, 'test-centres-submit').click()
     SearchLoop(first=True)
 
 
 def SearchLoop(first=False):
     def Wait():
-        wait_time = numpy.random.uniform(0.8, 1.2)
+        wait_time = numpy.random.uniform(1, 2)
         printAndLog("\nWaiting: " + "{:.2f}".format(wait_time))
         time.sleep(60 * wait_time)
 
     try:
 
         driver.execute_script("window.scrollTo(0,0)")
-        time.sleep(1)
+        RandomWait(1, 2)
 
         if not first:
             driver.find_element(By.ID, 'test-centres-submit').click()
@@ -402,7 +400,7 @@ def SearchLoop(first=False):
         available_sites = [x for x in search_results if x['availability'] is not None]
 
         if len(available_sites) != 0:
-            RandomWait(0.5, 1)
+            RandomWait(1, 2)
             for site in available_sites:
                 driver.get(site['link'])
                 date_submitted = CalendarLoop()
@@ -485,7 +483,7 @@ def CalendarLoop():
 
     printAndLog("")
     printAndLog("Going back to calendar")
-    RandomWait(0.5, 1)
+    RandomWait(1, 2.5)
     driver.back()
     return False
 
@@ -539,12 +537,13 @@ class wantedLocation:
 def captcha_loop():
     captcha_counter = 0
     while page_id == 666:
-        RandomWait(0.5, 1)
         UpdatePageID(1, print_id=False)
 
         captcha_counter = captcha_counter + 1
         if captcha_counter % 10 == 0:
             print('%i seconds passed' % captcha_counter)
+        
+        time.sleep(1)
 
 def click_captcha():
     for i in range(2):
@@ -569,7 +568,7 @@ def get_driver():
 
 
 if __name__ == '__main__':
-    load_dotenv("RYAN.env")
+    load_dotenv("credentials.env")
     page_limit = 20
     months = [
         "January",
@@ -586,10 +585,10 @@ if __name__ == '__main__':
         "December"
     ]
 
-    post_code = "OX12"
+    post_code = "CA1"
 
-    start_date_str = '10/06/2022'
-    end_date_str = '08/07/2022'
+    start_date_str = '30/11/2022'
+    end_date_str = '01/01/2023'
     start_date_num = int(datetime.strptime(start_date_str, '%d/%m/%Y').timestamp())
     end_date_num = int(datetime.strptime(end_date_str, '%d/%m/%Y').timestamp())
 
@@ -597,7 +596,7 @@ if __name__ == '__main__':
     termination_secs = (end_time.hour * 60 * 60) + (end_time.minute * 60)
 
     wanted = {
-        'Newbury': wantedLocation(
+        'Carlisle': wantedLocation(
             start_date_str,
             end_date_str,
             None
@@ -634,6 +633,7 @@ if __name__ == '__main__':
             try:
                 with get_driver() as driver:
                     print("got driver")
+                    driver.maximize_window()
                     page_id = None
                     page_counter = 0
 
@@ -682,10 +682,7 @@ if __name__ == '__main__':
                             printAndLog("Blocked by security rules, restarting")
                             driver.quit()
                         elif page_id == 666:
-                            try:
-                                click_captcha()
-                            finally:
-                                captcha_loop()
+                            captcha_loop()
                         elif page_id == 667:
                             printAndLog("Server error")
                             raise Exception("Server Error")
