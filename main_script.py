@@ -585,7 +585,7 @@ if __name__ == '__main__':
         "December"
     ]
 
-    post_code = "CA1"
+    post_code = "OX1"
 
     start_date_str = '30/11/2022'
     end_date_str = '01/01/2023'
@@ -596,7 +596,7 @@ if __name__ == '__main__':
     termination_secs = (end_time.hour * 60 * 60) + (end_time.minute * 60)
 
     wanted = {
-        'Carlisle': wantedLocation(
+        'Oxford': wantedLocation(
             start_date_str,
             end_date_str,
             None
