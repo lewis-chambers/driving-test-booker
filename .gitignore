@@ -4,8 +4,10 @@
 /Include
 *.env
 *.cfg
-/logs
+*/logs
 /__pycache__
 TOKEN.txt
 .DS_STORE
 *.swp
+*egg-info
+*.pyc
