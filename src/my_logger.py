@@ -7,7 +7,7 @@ from distutils.dir_util import remove_tree
 class Logger(logging.Logger):
     _active_logs = []
 
-    def __init__(self,log_directory: str, name: str="root", *,
+    def __init__(self, name: str="root", *, log_directory: str="", 
     clean_logs: bool=True):
         """Initialises the class and creates the logger with requested name.
         
@@ -25,41 +25,47 @@ class Logger(logging.Logger):
 
         self.log_base_directory = log_directory
 
-        self.init_time = self.get_creation_time()
-        self.log_directory = os.path.join(self.log_base_directory, self.init_time)
-        self.log_file = os.path.join(self.log_directory, "log.txt")
-
-        __class__._active_logs.append(self.log_directory)
-
-        self.init_log_directory()
         self.init_logger()
+
+        if self.log_base_directory != "":
+            self.add_file_handler()
 
         if clean_logs:
             self.clean_logs()
     
     def __del__(self):
-        __class__._active_logs.remove(self.log_directory)
+        if hasattr(self, "log_directory"):
+            __class__._active_logs.remove(self.log_directory)
 
     def init_logger(self):
         """Initialises the output streams of the loggger."""
         c_handler = logging.StreamHandler()
-        f_handler = logging.FileHandler(self.log_file, mode="w")
 
         c_handler.setLevel(logging.DEBUG)
-        f_handler.setLevel(logging.WARNING)
 
         c_handler.setFormatter(
             logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         )
 
+        self.addHandler(c_handler)
+        self.setLevel(logging.DEBUG)
+
+    def add_file_handler(self):
+        """Adds a log file handler"""
+
+        self.init_time = self.get_creation_time()
+        self.log_directory = os.path.join(self.log_base_directory, self.init_time)
+        self.log_file = os.path.join(self.log_directory, "log.txt")
+
+        self.init_log_directory()
+        __class__._active_logs.append(self.log_directory)
+
+        f_handler = logging.FileHandler(self.log_file, mode="w")
+        f_handler.setLevel(logging.WARNING)
         f_handler.setFormatter(
             logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         )
-
-        self.addHandler(c_handler)
         self.addHandler(f_handler)
-
-        self.setLevel(logging.DEBUG)
 
     @staticmethod
     def get_creation_time():

@@ -15,29 +15,29 @@ class TestLoggerCreation(unittest.TestCase):
             remove_tree(self.test_dir)
 
     def test_instantiation(self):
-        logger = Logger(self.test_dir, "myname")
+        logger = Logger("myname", log_directory=self.test_dir)
 
         self.assertEqual(logger.name, "myname")
     
     def test_no_name_used_root_logger(self):
 
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
 
         self.assertEqual(logger.name, 'root')
     
     def test_log_directory_set(self):
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
         self.assertEqual(logger.log_base_directory, self.test_dir)
 
     def test_log_timestamp_correct_format(self):
 
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
 
         match = re.search(r"\d{4}-\d{2}-\d{2}--\d{2}-\d{2}-\d{2}", logger.init_time)
         self.assertFalse(match is None)
     
     def test_log_directories_created(self):
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
 
         self.assertTrue(os.path.isdir(self.test_dir))
         
@@ -57,14 +57,14 @@ class TestLoggerCreation(unittest.TestCase):
 
     def test_active_loggers_added_to_list(self):
 
-        logger1 = Logger(self.test_dir)
+        logger1 = Logger(log_directory=self.test_dir)
 
         self.assertListEqual(Logger._active_logs, [logger1.log_directory])
 
         time.sleep(1)
-        logger2 = Logger(self.test_dir)
+        logger2 = Logger(log_directory=self.test_dir)
         time.sleep(2)
-        logger3 = Logger(self.test_dir)
+        logger3 = Logger(log_directory=self.test_dir)
 
         self.assertListEqual(Logger._active_logs,
         [logger1.log_directory, logger2.log_directory, logger3.log_directory])
@@ -82,7 +82,7 @@ class TestLoggerCreation(unittest.TestCase):
         with open(test_file, "w") as f:
             f.write("hello")
 
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
 
         self.assertTrue(os.path.isfile(test_file))
     
@@ -106,9 +106,9 @@ class TestLogRemoval(unittest.TestCase):
             pass
 
     def test_active_logs_not_cleaned(self):
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
         time.sleep(1)
-        logger2 = Logger(self.test_dir)
+        logger2 = Logger(log_directory=self.test_dir)
 
         logger2.clean_logs()
 
@@ -117,9 +117,9 @@ class TestLogRemoval(unittest.TestCase):
         self.assertEqual(len(logs), 3)
 
     def test_empty_inactive_logs_cleaned(self):
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
         time.sleep(1)
-        logger2 = Logger(self.test_dir)
+        logger2 = Logger(log_directory=self.test_dir)
         del(logger)
         logger2.clean_logs()
 
@@ -128,10 +128,10 @@ class TestLogRemoval(unittest.TestCase):
         self.assertEqual(len(logs), 2)
     
     def test_nonempty_inactive_logs_not_cleaned(self):
-        logger = Logger(self.test_dir)
+        logger = Logger(log_directory=self.test_dir)
         logger.warning("A warning")
         time.sleep(1)
-        logger2 = Logger(self.test_dir)
+        logger2 = Logger(log_directory=self.test_dir)
         del(logger)
         logger2.clean_logs()
 
