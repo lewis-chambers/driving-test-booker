@@ -1,5 +1,5 @@
 import unittest
-from src.new_script import DateRange, Date
+from src.new_script import DateRange, Date, TimeRange
 from datetime import datetime
 class TestDateRangeClass(unittest.TestCase):
 
@@ -29,17 +29,17 @@ class TestDateRangeClass(unittest.TestCase):
         date_obj = DateRange(start, end)
 
         format = '%d/%m/%Y %H:%M:%S'
-        between = date_obj.is_valid_datetime(
+        between = date_obj.is_between(
             datetime.strptime("01/02/2022 10:01:02", format)
         )
-        before = date_obj.is_valid_datetime(
+        before = date_obj.is_between(
             datetime.strptime("01/02/2021 10:01:02", format)
         )
-        after = date_obj.is_valid_datetime(
+        after = date_obj.is_between(
             datetime.strptime("01/02/2023 10:01:02", format)
         )
-        on_start = date_obj.is_valid_datetime(date_obj.start)
-        on_end = date_obj.is_valid_datetime(date_obj.end)
+        on_start = date_obj.is_between(date_obj.start)
+        on_end = date_obj.is_between(date_obj.end)
 
         self.assertTrue(between, "Should be true if between dates.")
         self.assertFalse(before, "Should be false if before start")
@@ -64,3 +64,49 @@ class TestDateClass(unittest.TestCase):
         self.assertEqual(obj.date.minute, 0)
         self.assertEqual(obj.date.second, 0)
         self.assertEqual(obj.date.microsecond, 0)
+
+class TestTimeRangeClass(unittest.TestCase):
+
+    def test_str_to_date_returns_right_date(self):
+
+        start = "09:00:00"
+        end = "17:01:02"
+
+        date_obj = TimeRange(start, end)
+
+        self.assertEqual(str(date_obj.start.time()), start)
+        self.assertEqual(str(date_obj.end.time()), end)
+
+    def test_error_if_end_before_start(self):
+
+        start = "17:00:00"
+        end = "09:01:02"
+
+        with self.assertRaises(ValueError):
+            TimeRange(start, end)
+
+    def test_true_if_date_query_between_dates(self):
+
+        start = "09:00:00"
+        end = "17:01:02"
+
+        date_obj = TimeRange(start, end)
+
+        format = '%H:%M:%S'
+        between = date_obj.is_between(
+            datetime.strptime("10:00:00", format)
+        )
+        before = date_obj.is_between(
+            datetime.strptime("02:30:00", format)
+        )
+        after = date_obj.is_between(
+            datetime.strptime("23:00:00", format)
+        )
+        on_start = date_obj.is_between(date_obj.start)
+        on_end = date_obj.is_between(date_obj.end)
+
+        self.assertTrue(between, "Should be true if between dates.")
+        self.assertFalse(before, "Should be false if before start")
+        self.assertFalse(after, "Should be false if after end.")
+        self.assertTrue(on_start, "Should be true if on start time")
+        self.assertTrue(on_end, "Should be true if on end time.")
