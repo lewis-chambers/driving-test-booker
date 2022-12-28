@@ -4,13 +4,15 @@ import re
 from datetime import datetime
 from distutils.dir_util import remove_tree
 
+
 class Logger(logging.Logger):
     _active_logs = []
 
-    def __init__(self, name: str="root", *, log_directory: str="", 
-    clean_logs: bool=True):
+    def __init__(
+        self, name: str = "root", *, log_directory: str = "", clean_logs: bool = True
+    ):
         """Initialises the class and creates the logger with requested name.
-        
+
         Args:
             log_directory: Base directory of Logger.
             name: Name of the logger.
@@ -32,7 +34,7 @@ class Logger(logging.Logger):
 
         if clean_logs:
             self.clean_logs()
-    
+
     def __del__(self):
         if hasattr(self, "log_directory"):
             __class__._active_logs.remove(self.log_directory)
@@ -44,7 +46,7 @@ class Logger(logging.Logger):
         c_handler.setLevel(logging.DEBUG)
 
         c_handler.setFormatter(
-            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         )
 
         self.addHandler(c_handler)
@@ -63,7 +65,7 @@ class Logger(logging.Logger):
         f_handler = logging.FileHandler(self.log_file, mode="w")
         f_handler.setLevel(logging.WARNING)
         f_handler.setFormatter(
-            logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         )
         self.addHandler(f_handler)
 
@@ -72,7 +74,7 @@ class Logger(logging.Logger):
         """Gets a timestamp of the current time."""
 
         return datetime.now().strftime("%Y-%m-%d--%H-%M-%S")
-    
+
     def clean_logs(self):
         """Iterates through log directories and removes empty logs."""
         try:
@@ -80,14 +82,17 @@ class Logger(logging.Logger):
         except StopIteration:
             return
 
-        dirs = [x for x in content[1] if
-            re.search(r"\d{4}-\d{2}-\d{2}--\d{2}-\d{2}-\d{2}", x) is not None and
-            os.path.join(self.log_base_directory, x) not in Logger._active_logs]
+        dirs = [
+            x
+            for x in content[1]
+            if re.search(r"\d{4}-\d{2}-\d{2}--\d{2}-\d{2}-\d{2}", x) is not None
+            and os.path.join(self.log_base_directory, x) not in Logger._active_logs
+        ]
 
         for log_folder in dirs:
             log_folder_path = os.path.join(self.log_base_directory, log_folder)
             log_file = os.path.join(log_folder_path, "log.txt")
-            
+
             if not os.path.isfile(log_file) or os.path.getsize(log_file) == 0:
                 remove_tree(log_folder_path)
 
@@ -96,4 +101,3 @@ class Logger(logging.Logger):
 
         if not os.path.isdir(self.log_directory):
             os.makedirs(self.log_directory)
-        

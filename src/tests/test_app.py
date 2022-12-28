@@ -1,8 +1,9 @@
 import unittest
 from src.new_script import DateRange, Date, TimeRange
 from datetime import datetime
-class TestDateRangeClass(unittest.TestCase):
 
+
+class TestDateRangeClass(unittest.TestCase):
     def test_str_to_date_returns_right_date(self):
 
         start = "01/02/2022 10:01:02"
@@ -28,16 +29,10 @@ class TestDateRangeClass(unittest.TestCase):
 
         date_obj = DateRange(start, end)
 
-        format = '%d/%m/%Y %H:%M:%S'
-        between = date_obj.is_between(
-            datetime.strptime("01/02/2022 10:01:02", format)
-        )
-        before = date_obj.is_between(
-            datetime.strptime("01/02/2021 10:01:02", format)
-        )
-        after = date_obj.is_between(
-            datetime.strptime("01/02/2023 10:01:02", format)
-        )
+        format = "%d/%m/%Y %H:%M:%S"
+        between = date_obj.is_between(datetime.strptime("01/02/2022 10:01:02", format))
+        before = date_obj.is_between(datetime.strptime("01/02/2021 10:01:02", format))
+        after = date_obj.is_between(datetime.strptime("01/02/2023 10:01:02", format))
         on_start = date_obj.is_between(date_obj.start)
         on_end = date_obj.is_between(date_obj.end)
 
@@ -47,26 +42,25 @@ class TestDateRangeClass(unittest.TestCase):
         self.assertTrue(on_start, "Should be true if on start time")
         self.assertTrue(on_end, "Should be true if on end time.")
 
-class TestDateClass(unittest.TestCase):
 
+class TestDateClass(unittest.TestCase):
     def test_datetime_returned(self):
-        
+
         obj = Date("01/02/2022")
 
         self.assertIsInstance(obj.date, datetime)
 
-
     def test_datetime_time_is_zero(self):
-        
-        obj = Date("01/02/2022 01:02:01", format = "%d/%m/%Y %H:%M:%S")
+
+        obj = Date("01/02/2022 01:02:01", format="%d/%m/%Y %H:%M:%S")
 
         self.assertEqual(obj.date.hour, 0)
         self.assertEqual(obj.date.minute, 0)
         self.assertEqual(obj.date.second, 0)
         self.assertEqual(obj.date.microsecond, 0)
 
-class TestTimeRangeClass(unittest.TestCase):
 
+class TestTimeRangeClass(unittest.TestCase):
     def test_str_to_date_returns_right_date(self):
 
         start = "09:00:00"
@@ -92,16 +86,10 @@ class TestTimeRangeClass(unittest.TestCase):
 
         date_obj = TimeRange(start, end)
 
-        format = '%H:%M:%S'
-        between = date_obj.is_between(
-            datetime.strptime("10:00:00", format)
-        )
-        before = date_obj.is_between(
-            datetime.strptime("02:30:00", format)
-        )
-        after = date_obj.is_between(
-            datetime.strptime("23:00:00", format)
-        )
+        format = "%H:%M:%S"
+        between = date_obj.is_between(datetime.strptime("10:00:00", format))
+        before = date_obj.is_between(datetime.strptime("02:30:00", format))
+        after = date_obj.is_between(datetime.strptime("23:00:00", format))
         on_start = date_obj.is_between(date_obj.start)
         on_end = date_obj.is_between(date_obj.end)
 
