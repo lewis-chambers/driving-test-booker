@@ -2,7 +2,7 @@ from src.my_logger import Logger
 import os
 import undetected_chromedriver
 from datetime import datetime
-from typing import Union, List
+from typing import Union, List, Tuple
 
 
 class App:
@@ -23,19 +23,23 @@ class App:
 class DateRange:
     """Represented a range of two increasing dates."""
 
-    def __init__(self, start: str, end: str, format: str = "%d/%m/%Y %H:%M:%S"):
+    def __init__(self, date_range: Tuple[str], *, format: str = "%d/%m/%Y %H:%M:%S"):
         """Initialises the object.
 
         Args:
-            start: Start time.
-            end: End time.
+            date_range: The date range given as a tuple of strings.
             format: `datetime` format used.
 
         Returns:
             None.
         """
-        self.start = datetime.strptime(start, format)
-        self.end = datetime.strptime(end, format)
+        if not hasattr(date_range, "__iter__"):
+            raise TypeError("`time_range` must be an iterable object.")
+        if not len(date_range) == 2:
+            raise ValueError(f"`time_range` must have 2 items, not '{len(date_range)}'")
+
+        self.start = datetime.strptime(date_range[0], format)
+        self.end = datetime.strptime(date_range[1], format)
 
         if self.start > self.end:
             raise ValueError("Start date must be before end date.")
@@ -81,19 +85,24 @@ class Date:
 class TimeRange:
     """A Time Range."""
 
-    def __init__(self, start: str, end: str, format: str = "%H:%M:%S"):
+    def __init__(self, time_range: Tuple[str], *, format: str = "%H:%M:%S"):
         """Initialises the object.
 
         Args:
-            start: Start time.
-            end: End time.
+            time_range: The time range.
             format: `datetime` format used.
 
         Returns:
             None.
         """
-        self.start = datetime.strptime(start, format)
-        self.end = datetime.strptime(end, format)
+
+        if not hasattr(time_range, "__iter__"):
+            raise TypeError("`time_range` must be an iterable object.")
+        if not len(time_range) == 2:
+            raise ValueError(f"`time_range` must have 2 items, not '{len(time_range)}'")
+
+        self.start = datetime.strptime(time_range[0], format)
+        self.end = datetime.strptime(time_range[1], format)
 
         if self.start.time() > self.end.time():
             raise ValueError("Start date must be before end date.")
@@ -116,10 +125,66 @@ class TimeRange:
         return False
 
 
-# class WeekTimes:
-#     """Represents the available times during each week."""
+class WeekTimes:
+    """Represents the available times during each week."""
 
-#     def __init__(self, )
+    def __init__(
+        self,
+        time_range: Tuple[str],
+        *,
+        format: str = "%H:%M:%S",
+        weekdays: Tuple[Tuple[str], bool] = (True, True, True, True, True, True, True),
+    ):
+        """Instanitates the class.
+
+        Args:
+            time_range: The default time range.
+            format: String of the time range format.
+            weekdays: Tuple of time ranges for each workday. A value of `False` means skip this day, and `True` uses default."""
+
+        if not hasattr(time_range, "__iter__"):
+            raise TypeError("`time_range` must be an iterable object.")
+        if not len(time_range) == 2:
+            raise ValueError(f"`time_range` must have 2 items, not '{len(time_range)}'")
+
+        if not hasattr(weekdays, "__iter__"):
+            raise TypeError("`weekdays` must be an iterable object.")
+        if not len(weekdays) == 7:
+            raise ValueError(f"`weekdays` must have 7 items, not '{len(weekdays)}'")
+
+        for i, item in enumerate(weekdays):
+            if not isinstance(item, bool) and not hasattr(item, "__iter__"):
+                raise TypeError(f"weekdays[{i}] is not a bool or iterable:\n'{item}'")
+            if not isinstance(item, bool) and len(item) != 2:
+                raise ValueError(
+                    f"Each item of `weekdays` must have 2 items, not '{len(item)}'"
+                )
+
+        self.weekdays = tuple(
+            [x if isinstance(x, bool) else TimeRange(x) for x in weekdays]
+        )
+
+        self.time_range = TimeRange(time_range, format=format)
+
+    def is_valid_time(self, date: datetime) -> bool:
+        """Checks if date is between start and end.
+
+        Args:
+            date: Query datetime.
+        Returns:
+            True or false.
+        """
+
+        day = self.weekdays[date.weekday()]
+
+        if day is True:
+            return self.time_range.is_between(date)
+        elif day is False:
+            return False
+        else:
+            return day.is_between(date)
+
+
 class Search:
     """Class for holding search details for application."""
 
